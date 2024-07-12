@@ -1,7 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Home.css';
 
 function Home() {
+  const [isChatBoxVisible, setIsChatBoxVisible] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [currentMessage, setCurrentMessage] = useState('');
+
+  const toggleChatBox = () => {
+    setIsChatBoxVisible(!isChatBoxVisible);
+  };
+
+  const handleSendMessage = () => {
+    if (currentMessage.trim() !== '') {
+      setMessages([...messages, { text: currentMessage, sender: 'user' }]);
+      setCurrentMessage('');
+      // Simulate a response from "Sonya"
+      setTimeout(() => {
+        setMessages(prevMessages => [...prevMessages, { text: 'This is an automated response.', sender: 'sonya' }]);
+      }, 1000);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    setCurrentMessage(e.target.value);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSendMessage();
+    }
+  };
   return (
     <div className="home">
       <nav className="navbar">
@@ -46,8 +74,35 @@ function Home() {
       </section>
 
       <div className="chat-button">
-        <button>Chat with Sonya</button>
+        <button onClick={toggleChatBox}>Chat with Sonya</button>
       </div>
+
+      {isChatBoxVisible && (
+        <div className="chat-box">
+          <div className="chat-header">
+            <img src="/src/components/chatwomen.png" alt="Hero" className="chat-hero-image" /> {/* Update with correct image path */}
+            <span>Chat with Sonya</span>
+            <button onClick={toggleChatBox} className="close-chat-btn">x</button>
+          </div>
+          <div className="chat-body">
+            {messages.map((message, index) => (
+              <div key={index} className={`chat-message ${message.sender}`}>
+                {message.text}
+              </div>
+            ))}
+          </div>
+          <div className="chat-input">
+            <input
+              type="text"
+              value={currentMessage}
+              onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
+              placeholder="Type a message..."
+            />
+            <button onClick={handleSendMessage}>Send</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
